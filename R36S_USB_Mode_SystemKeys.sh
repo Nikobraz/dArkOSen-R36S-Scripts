@@ -11,7 +11,6 @@ SELF="$(readlink -f -- "$0")"
 LOG='/home/ark/r36s-usb-mode.log'
 BOOT='/boot'
 BOOTINI="$BOOT/boot.ini"
-BASELINE="$BOOT/rk3326-r36s-linux.dtb.usb-original.bak"
 USB_NODE='/usb@ff300000'
 PHY_NODE='/syscon@ff2c0000/usb2-phy@100/otg-port'
 GPTOKEYB='/opt/inttools/gptokeyb'
