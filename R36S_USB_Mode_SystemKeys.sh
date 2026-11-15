@@ -52,6 +52,8 @@ fi
 
 echo "Detected DTB: $DTB"
 
+BASELINE="$BOOT/${DTB_NAME#./}.usb-original.bak"
+
 # Escalate privileges. The ES menu often has no password-entry TTY.
 if (( EUID != 0 )); then
     if [[ -t 0 && -t 1 ]]; then
