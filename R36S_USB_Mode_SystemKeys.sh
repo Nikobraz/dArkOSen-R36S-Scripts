@@ -10,7 +10,6 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PATH
 SELF="$(readlink -f -- "$0")"
 LOG='/home/ark/r36s-usb-mode.log'
 BOOT='/boot'
-DTB="$BOOT/rk3326-r36s-linux.dtb"
 BOOTINI="$BOOT/boot.ini"
 BASELINE="$BOOT/rk3326-r36s-linux.dtb.usb-original.bak"
 USB_NODE='/usb@ff300000'
@@ -23,6 +22,35 @@ DTB_TMP=''
 GPT_PID=''
 
 log() { printf '%s %s\n' "$(date -Is 2>/dev/null || date)" "$*" >> "$LOG" 2>/dev/null || true; }
+
+
+# Detect active DTB from boot.ini
+
+if [[ ! -f "$BOOTINI" ]]; then
+    echo "ERROR: boot.ini not found"
+    exit 1
+fi
+
+DTB_NAME=$(awk '
+    $1 == "load" && $2 == "mmc" && $4 == "${dtb_loadaddr}" {
+        print $5
+        exit
+    }
+' "$BOOTINI" | tr -d '\r"')
+
+if [[ -z "$DTB_NAME" ]]; then
+    echo "ERROR: Cannot detect DTB from boot.ini"
+    exit 1
+fi
+
+DTB="${BOOT}/${DTB_NAME#./}"
+
+if [[ ! -f "$DTB" ]]; then
+    echo "ERROR: DTB file not found: $DTB"
+    exit 1
+fi
+
+echo "Detected DTB: $DTB"
 
 # Escalate privileges. The ES menu often has no password-entry TTY.
 if (( EUID != 0 )); then
